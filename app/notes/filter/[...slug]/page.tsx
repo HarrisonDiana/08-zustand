@@ -11,7 +11,7 @@ type Props = {
 const allowedTags = ["Todo", "Work", "Personal", "Meeting", "Shopping", "All"];
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
   const tag = slug?.[0]?.toLowerCase() === "all" ? "All Notes" : slug?.[0] ?? "Notes";
 
   const title = `NoteHub - ${tag}`;
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function FilteredNotesPage({ params }: Props) {
-  const { slug } = params;
+  const { slug } = await params;
   const rawTag = slug?.[0] ?? "All";
 
   const isValid = allowedTags.map((t) => t.toLowerCase()).includes(rawTag.toLowerCase());
