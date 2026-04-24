@@ -151,20 +151,27 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import css from "@/components/NotesPage/NotesPage.module.css";
 import { fetchNotes } from "@/lib/api";
 import NoteList from "@/components/NoteList/NoteList";
 import Pagination from "@/components/Pagination/Pagination";
 import { SearchBox } from "@/components/SearchBox/SearchBox";
 import type { FetchNotesResponse } from "@/lib/api";
+import type { Note } from "@/types/note";
 
 type NotesProps = { tag: string };
 
 export default function Notes({ tag }: NotesProps) {
+  const router = useRouter();
+
   const perPage = 12;
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebounce(search, 500);
   const [page, setPage] = useState(1);
+
+  // 👉 для удаления
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const { data, isLoading, isError } = useQuery<FetchNotesResponse, Error>({
     queryKey: ["notes", page, debouncedSearch, tag],
@@ -185,10 +192,27 @@ export default function Notes({ tag }: NotesProps) {
     setPage(1);
   };
 
+
+  const handleNoteClick = (note: Note) => {
+    router.push(`/notes/${note.id}`);
+  };
+
+
+  const handleDelete = (id: string) => {
+    setDeletingId(id);
+    console.log("delete note:", id);
+
+
+    setTimeout(() => {
+      setDeletingId(null);
+    }, 500);
+  };
+
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
         <SearchBox value={search} onChange={handleSearchChange} />
+
         {totalPages > 1 && (
           <Pagination
             totalPages={totalPages}
@@ -196,6 +220,7 @@ export default function Notes({ tag }: NotesProps) {
             onPageChange={setPage}
           />
         )}
+
         <Link href="/notes/action/create" className={css.button}>
           Create note +
         </Link>
@@ -205,7 +230,12 @@ export default function Notes({ tag }: NotesProps) {
       {isError && <p>Error loading notes</p>}
 
       {notes.length > 0 ? (
-        <NoteList notes={notes} />
+        <NoteList
+          notes={notes}
+          onNoteClick={handleNoteClick}
+          onDeleteNote={handleDelete}
+          deletingNoteId={deletingId}
+        />
       ) : (
         <p>No notes found.</p>
       )}
