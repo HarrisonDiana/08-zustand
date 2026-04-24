@@ -37,22 +37,15 @@
 // }
 "use client";
 
+import Link from "next/link";
 import css from "./NoteList.module.css";
 import type { Note } from "@/types/note";
 
 type NoteListProps = {
   notes: Note[];
-  onNoteClick: (note: Note) => void;
-  onDeleteNote: (id: string) => void;
-  deletingNoteId: string | null;
 };
 
-export default function NoteList({
-  notes,
-  onNoteClick,
-  onDeleteNote,
-  deletingNoteId,
-}: NoteListProps) {
+export default function NoteList({ notes }: NoteListProps) {
   return (
     <ul className={css.list}>
       {notes.map((note) => (
@@ -63,20 +56,12 @@ export default function NoteList({
           <div className={css.footer}>
             <span className={css.tag}>{note.tag}</span>
 
-            <button
+            <Link
+              href={`/notes/${note.id}`}
               className={css.viewbutton}
-              onClick={() => onNoteClick(note)}
             >
               View details
-            </button>
-
-            <button
-              className={css.button}
-              onClick={() => onDeleteNote(note.id)}
-              disabled={deletingNoteId === note.id}
-            >
-              {deletingNoteId === note.id ? "Deleting..." : "Delete"}
-            </button>
+            </Link>
           </div>
         </li>
       ))}
