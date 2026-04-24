@@ -122,7 +122,7 @@ import css from "./NoteForm.module.css";
 import { useNoteStore } from "@/lib/store/noteStore";
 import { createNote } from "@/lib/api";
 import type { CreateNotePayload } from "@/lib/api";
-import type { Note } from "@/types/note";
+
 
 export interface NoteFormProps {
   onAdd?: (payload: CreateNotePayload) => Promise<void> | void;
@@ -177,22 +177,20 @@ export default function NoteForm({ onAdd, onCancel }: NoteFormProps) {
 
     try {
       if (onAdd) {
-        // parent will handle creation (modal case)
         await onAdd(payload);
         clearDraft();
         onCancel?.();
         return;
       }
 
-const created: Note = await createMutation.mutateAsync(payload);
-router.push(`/notes/${created.id}`);
+    
+      await createMutation.mutateAsync(payload);
 
-     const createdId = created.id;
-      if (createdId) {
-        router.push(`/notes/${createdId}`);
-      } else {
-        router.push("/notes");
-      }
+      
+      clearDraft();
+
+
+      router.back();
     } catch (err) {
       console.error("Create note failed:", err);
       alert("Failed to create note. See console for details.");
