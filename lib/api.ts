@@ -1,7 +1,6 @@
 import axios from "axios";
 import type { Note } from "../types/note";
 
-console.log("TOKEN:", process.env.NEXT_PUBLIC_NOTEHUB_TOKEN);
 
 export type FetchNotesResponse = {
   notes: Note[];
